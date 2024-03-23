@@ -18,9 +18,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType.Companion.Text
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.mynotes.NavScreen
 import com.example.mynotes.NoteViewModel
 import com.example.mynotes.db.NotesEntity
+import dagger.hilt.android.lifecycle.HiltViewModel
 
 @Composable
 fun AddNoteScreen(
@@ -59,7 +62,8 @@ fun AddNoteScreen(
             onClick = {
                 val newNote = NotesEntity(title = noteTitle, content = noteContent)
                 noteViewModel.insert(newNote)
-                navController.popBackStack()
+                navController.navigate(NavScreen.NoteListScreen.route)
+               // navController.popBackStack()
             },
             modifier = Modifier.align(Alignment.End)
         ) {

@@ -3,6 +3,7 @@ package com.example.mynotes.screens
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -18,20 +19,24 @@ import com.example.mynotes.NoteViewModel
 import com.example.mynotes.db.NoteDao
 import com.example.mynotes.db.NotesDb
 import com.example.mynotes.ui.theme.MyNotesTheme
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-   private lateinit var noteViewModel: NoteViewModel
-   private lateinit var appDatabase: NotesDb
 
+    private val noteViewModel:NoteViewModel by viewModels()
 
-
+   // @Inject lateinit var noteViewModel: NoteViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        appDatabase = NotesDb.getDatabase(applicationContext)
+     //   appDatabase = NotesDb.getDatabase(applicationContext)
 
-        noteViewModel = NoteViewModel(appDatabase.notesDao())
+      //  noteViewModel = NoteViewModel(appDatabase.notesDao())
+
 
         setContent {
             MyNotesTheme {
@@ -40,7 +45,9 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Start(noteViewModel)
+
+
+                    Start(noteViewModel = noteViewModel)
                 }
             }
         }
@@ -51,16 +58,19 @@ class MainActivity : ComponentActivity() {
 fun Start(noteViewModel: NoteViewModel) {
 
 
-
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = NavScreen.NoteListScreen.route ){
         composable(route = NavScreen.NoteListScreen.route){
-            NoteListScreen(noteViewModel = noteViewModel)
+            NoteListScreen(navController = navController,
+                noteViewModel = noteViewModel)
         }
         
         composable(route= NavScreen.AddNoteScreen.route){
-            AddNoteScreen(navController = navController, noteViewModel)
+
+            AddNoteScreen(navController = navController,
+                noteViewModel = noteViewModel
+            )
         }
     }
 }

@@ -2,6 +2,8 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id ("kotlin-kapt")
+    id ("com.google.dagger.hilt.android")
+
 
 }
 
@@ -73,10 +75,23 @@ dependencies {
     implementation ("androidx.navigation:navigation-compose:2.7.7")
 
 
+    //hilt
+    implementation ("com.google.dagger:hilt-android:2.50")
+    kapt ("com.google.dagger:hilt-compiler:2.50")
+
+
     //Room
     implementation("androidx.room:room-runtime:2.6.1")
     implementation ("androidx.room:room-ktx:2.6.1")
     annotationProcessor("androidx.room:room-compiler:2.6.1")
     kapt ("androidx.room:room-compiler:2.6.1")
+
+
+    // Retrofit
+
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation ("com.squareup.okhttp3:okhttp:4.9.3")
+
 
 }

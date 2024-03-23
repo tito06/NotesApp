@@ -5,10 +5,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mynotes.db.NoteDao
 import com.example.mynotes.db.NotesEntity
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class NoteViewModel(private val notesDao: NoteDao) :ViewModel() {
+@HiltViewModel
+class NoteViewModel @Inject constructor(private val notesDao: NoteDao) :ViewModel() {
 
     val allNotes: Flow<List<NotesEntity>> = notesDao.getAllNotes()
 

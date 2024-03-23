@@ -12,7 +12,7 @@ abstract class NotesDb: RoomDatabase() {
     abstract fun notesDao():NoteDao
 
 
-    companion object{
+/*    companion object{
         @Volatile
         private var INSTANCE: NotesDb? = null
 
@@ -31,5 +31,5 @@ abstract class NotesDb: RoomDatabase() {
                 return  instance
             }
         }
-    }
+    }*/
 }
