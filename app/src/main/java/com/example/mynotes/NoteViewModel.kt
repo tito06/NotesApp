@@ -18,4 +18,8 @@ class NoteViewModel @Inject constructor(private val notesDao: NoteDao) :ViewMode
     fun insert(note:NotesEntity) = viewModelScope.launch{
         notesDao.insert(note)
     }
+
+    fun delete(note: NotesEntity) = viewModelScope.launch {
+        notesDao.deleteNote(note)
+    }
 }
