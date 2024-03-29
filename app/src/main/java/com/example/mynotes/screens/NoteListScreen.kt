@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.FloatingActionButton
@@ -30,6 +31,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.os.bundleOf
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -52,6 +54,8 @@ fun NoteListScreen(
         noteViewModel.allNotes.collectAsState(initial = emptyList())
 
 
+
+
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(onClick = {
@@ -72,7 +76,8 @@ fun NoteListScreen(
                   .background(Color.White)
                   ) {
 
-                  Row(modifier = Modifier.padding(8.dp,10.dp)
+                  Row(modifier = Modifier
+                      .padding(8.dp, 10.dp)
                       .fillMaxWidth(),
                       horizontalArrangement = Arrangement.SpaceBetween) {
                       Column {
@@ -89,15 +94,27 @@ fun NoteListScreen(
                               color = Color.Magenta)
                       }
 
+                      Row {
+                          IconButton(onClick = {
+                                navController.navigate("${NavScreen.UpdateScreen.route}/${note.title}/${note.content}/${note.id}")
+                          }) {
+                              Icon(imageVector = Icons.Default.Edit,
+                                  contentDescription ="Edit" )
 
-                      IconButton(onClick = {
-                          noteViewModel.delete(note)
-                      }) {
+                          }
 
-                          Icon(imageVector = Icons.Default.Delete,
-                              contentDescription ="Delete",
-                              tint = Color.Red)
+
+                          IconButton(onClick = {
+                              noteViewModel.delete(note)
+                          }) {
+
+                              Icon(imageVector = Icons.Default.Delete,
+                                  contentDescription ="Delete",
+                                  tint = Color.Red)
+                          }
                       }
+
+
 
                   }
                   }

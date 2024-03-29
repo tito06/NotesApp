@@ -61,6 +61,7 @@ fun Start(noteViewModel: NoteViewModel) {
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = NavScreen.NoteListScreen.route ){
+
         composable(route = NavScreen.NoteListScreen.route){
             NoteListScreen(navController = navController,
                 noteViewModel = noteViewModel)
@@ -71,6 +72,21 @@ fun Start(noteViewModel: NoteViewModel) {
             AddNoteScreen(navController = navController,
                 noteViewModel = noteViewModel
             )
+        }
+
+
+
+        composable(NavScreen.UpdateScreen.route + "/{title}" + "/{content}" + "/{id}"){
+            val title = it.arguments?.getString("title")
+            val content = it.arguments?.getString("content")
+            val id = it.arguments?.getString("id")
+            if (id != null) {
+                UpdateNoteScreen(navController = navController,
+                    noteViewModel =noteViewModel,
+                    title =title,
+                    content =content ,
+                    id = id.toLong())
+            }
         }
     }
 }

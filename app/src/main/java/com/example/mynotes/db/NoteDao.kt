@@ -16,6 +16,10 @@ interface NoteDao {
     @Update
     suspend fun update(note: NotesEntity)
 
+
+    @Query("SELECT * FROM notes WHERE id = :notesId")
+    suspend fun getNotesId(notesId:Long): NotesEntity
+
     @Query("SELECT * FROM notes")
     fun getAllNotes(): Flow<List<NotesEntity>>
 

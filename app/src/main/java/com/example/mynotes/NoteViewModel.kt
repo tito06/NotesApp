@@ -15,8 +15,14 @@ class NoteViewModel @Inject constructor(private val notesDao: NoteDao) :ViewMode
 
     val allNotes: Flow<List<NotesEntity>> = notesDao.getAllNotes()
 
+
+
     fun insert(note:NotesEntity) = viewModelScope.launch{
         notesDao.insert(note)
+    }
+
+    fun update(note: NotesEntity) = viewModelScope.launch {
+        notesDao.update(note)
     }
 
     fun delete(note: NotesEntity) = viewModelScope.launch {
