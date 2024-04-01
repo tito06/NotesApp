@@ -31,11 +31,25 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat
 import androidx.navigation.NavController
 import com.example.mynotes.NavScreen
 import com.example.mynotes.NoteViewModel
 import com.example.mynotes.db.NotesEntity
-import kotlinx.coroutines.flow.StateFlow
+import android.Manifest
+import android.content.Context
+import android.os.Environment
+import android.widget.Toast
+import com.google.gson.Gson
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.ObjectOutputStream
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -66,11 +80,28 @@ fun NoteListScreen(
     ) {
         Column {
             IconButton(onClick = {
+                val fileName = generateFileName()
+
                 if (noteViewModel.hasWritePermission(context)){
                     noteViewModel.exportToPDF(context,allNotes)
                 }else {
-                    noteViewModel.requestWritePermission(activity = Activity(),
-                        context,allNotes)
+                   /* noteViewModel.requestWritePermission(activity = Activity(),
+                        context,allNotes)*/
+
+                    ActivityCompat.requestPermissions(
+                        context as Activity,
+                        arrayOf<String?>(Manifest.permission.READ_EXTERNAL_STORAGE),
+                        23
+                    )
+
+                    val folder: File =
+                        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+
+                    val file = File(folder, fileName)
+                    //noteViewModel.exportToPDF( context, allNotes)
+                    writeTextData(file, allNotes, context)
+                    Toast.makeText(context, "Data saved publicly..", Toast.LENGTH_SHORT).show()
+
                 }
 
 
@@ -138,4 +169,34 @@ fun NoteListScreen(
 
         }
     }
+}
+
+private fun writeTextData(file: File, data: State<List<NotesEntity>>, context: Context) {
+    var fileOutputStream: FileOutputStream? = null
+    val gson = Gson()
+    val jsonString = gson.toJson(data)
+
+    try {
+        fileOutputStream = FileOutputStream(file)
+        //fileOutputStream.write(jsonString.toByteArray())
+
+        data.value.forEach { entity ->
+            fileOutputStream.write("${entity.id}, ${entity.title}, ${entity.content}\n".toByteArray())
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+    } finally {
+        if (fileOutputStream != null) {
+            try {
+                fileOutputStream.close()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+    }
+}
+
+fun generateFileName(): String {
+    val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+    return "download_$timeStamp.txt" // You can adjust the file extension as per your requirements
 }

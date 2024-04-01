@@ -56,7 +56,7 @@ class NoteViewModel @Inject constructor(private val notesDao: NoteDao) :ViewMode
         val entities = dataListState.value
         viewModelScope.launch {
             try {
-                val file = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "data.pdf")
+                val file = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "data.pdf")
                 val outputStream = FileOutputStream(file)
                 entities.forEach { entity ->
                     outputStream.write("${entity.id}, ${entity.title}, ${entity.content}\n".toByteArray())
