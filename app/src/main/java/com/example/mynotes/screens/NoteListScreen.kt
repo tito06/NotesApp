@@ -42,6 +42,16 @@ import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
 import android.os.Environment
 import android.widget.Toast
+import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.google.gson.Gson
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -53,6 +63,7 @@ import java.util.Date
 import java.util.Locale
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun NoteListScreen(
@@ -68,15 +79,75 @@ fun NoteListScreen(
 
    val context = LocalContext.current
 
-    val fileName = noteViewModel.generateFileName()
 
 
     val folder: File =
         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-    val file = File(folder, fileName)
+
+
+    var showDropDownMenu by remember { mutableStateOf(false) }
 
 
     Scaffold(
+        topBar = {
+                 TopAppBar(title = { Text(text = "Note App") },
+                     actions = {
+                        IconButton(onClick = { showDropDownMenu = true  }) {
+                            Icon(Icons.Filled.MoreVert, null)
+
+                        }
+
+                         DropdownMenu(
+                             showDropDownMenu, { showDropDownMenu = false }
+                             // offset = DpOffset((-102).dp, (-64).dp),
+                         ) {
+                             DropdownMenuItem(text = { Text(text = "Export to pdf") }, leadingIcon = {
+                                 Icon(imageVector = Icons.Filled.ExitToApp, contentDescription ="Export" )
+                             }, onClick = {
+                                 val fileName = noteViewModel.generateFileName("pdf")
+                                 val file = File(folder, fileName)
+                                 if (noteViewModel.hasWritePermission(context)){
+                                     noteViewModel.generatePdf(file,allNotes,context)
+
+                                 }else {
+
+                                     ActivityCompat.requestPermissions(
+                                         context as Activity,
+                                         arrayOf<String?>(Manifest.permission.READ_EXTERNAL_STORAGE),
+                                         23
+                                     )
+
+                                     noteViewModel.generatePdf(file,allNotes,context)
+
+                                 }
+                                 showDropDownMenu = false
+                             })
+                             DropdownMenuItem(text = { Text(text = "Export to txt") }, leadingIcon = {
+                                 Icon(imageVector = Icons.Filled.ExitToApp, contentDescription ="Export" )
+                             }, onClick = {
+                                 val fileName = noteViewModel.generateFileName("txt")
+                                 val file = File(folder, fileName)
+                                 if (noteViewModel.hasWritePermission(context)){
+                                     noteViewModel.generatePdf(file,allNotes,context)
+
+                                 }else {
+
+                                     ActivityCompat.requestPermissions(
+                                         context as Activity,
+                                         arrayOf<String?>(Manifest.permission.READ_EXTERNAL_STORAGE),
+                                         23
+                                     )
+
+                                     noteViewModel.writeTextData(file,allNotes,context)
+
+                                 }
+                                 showDropDownMenu = false
+                             })
+
+                         }
+                     }
+                     )
+        },
         floatingActionButton = {
             FloatingActionButton(onClick = {
                 navController.navigate(NavScreen.AddNoteScreen.route)
@@ -86,23 +157,10 @@ fun NoteListScreen(
             }
         }
     ) {
-        Column {
+        Column(modifier = Modifier.padding(10.dp)) {
             IconButton(onClick = {
 
-                if (noteViewModel.hasWritePermission(context)){
-                    noteViewModel.generatePdf(file,allNotes,context)
 
-                }else {
-
-                    ActivityCompat.requestPermissions(
-                        context as Activity,
-                        arrayOf<String?>(Manifest.permission.READ_EXTERNAL_STORAGE),
-                        23
-                    )
-
-                    noteViewModel.generatePdf(file,allNotes,context)
-
-                }
 
 
             }) {

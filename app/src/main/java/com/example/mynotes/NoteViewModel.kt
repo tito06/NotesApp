@@ -104,13 +104,17 @@ class NoteViewModel @Inject constructor(private val notesDao: NoteDao) :ViewMode
         ) == PackageManager.PERMISSION_GRANTED
     }
 
-    fun generateFileName(): String {
+    fun generateFileName(type:String): String {
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        return "download_$timeStamp.pdf" // You can adjust the file extension as per your requirements
+        if (type == "pdf") {
+            return "download_$timeStamp.pdf"
+        } else {
+            return "download_$timeStamp.txt"
+        }// You can adjust the file extension as per your requirements
     }
 
 
-    private fun writeTextData(file: File, data: State<List<NotesEntity>>, context: Context) {
+     fun writeTextData(file: File, data: State<List<NotesEntity>>, context: Context) {
         var fileOutputStream: FileOutputStream? = null
         val gson = Gson()
         val jsonString = gson.toJson(data)
@@ -122,6 +126,8 @@ class NoteViewModel @Inject constructor(private val notesDao: NoteDao) :ViewMode
             data.value.forEach { entity ->
                 fileOutputStream.write("${entity.id}, ${entity.title}, ${entity.content}\n".toByteArray())
             }
+            Toast.makeText(context, "Data saved publicly..", Toast.LENGTH_SHORT).show()
+
         } catch (e: Exception) {
             e.printStackTrace()
         } finally {
