@@ -38,6 +38,8 @@ import com.example.mynotes.NoteViewModel
 import com.example.mynotes.db.NotesEntity
 import android.Manifest
 import android.content.Context
+import android.graphics.Paint
+import android.graphics.pdf.PdfDocument
 import android.os.Environment
 import android.widget.Toast
 import com.google.gson.Gson
@@ -66,6 +68,12 @@ fun NoteListScreen(
 
    val context = LocalContext.current
 
+    val fileName = noteViewModel.generateFileName()
+
+
+    val folder: File =
+        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+    val file = File(folder, fileName)
 
 
     Scaffold(
@@ -80,13 +88,11 @@ fun NoteListScreen(
     ) {
         Column {
             IconButton(onClick = {
-                val fileName = generateFileName()
 
                 if (noteViewModel.hasWritePermission(context)){
-                    noteViewModel.exportToPDF(context,allNotes)
+                    noteViewModel.generatePdf(file,allNotes,context)
+
                 }else {
-                   /* noteViewModel.requestWritePermission(activity = Activity(),
-                        context,allNotes)*/
 
                     ActivityCompat.requestPermissions(
                         context as Activity,
@@ -94,13 +100,7 @@ fun NoteListScreen(
                         23
                     )
 
-                    val folder: File =
-                        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-
-                    val file = File(folder, fileName)
-                    //noteViewModel.exportToPDF( context, allNotes)
-                    writeTextData(file, allNotes, context)
-                    Toast.makeText(context, "Data saved publicly..", Toast.LENGTH_SHORT).show()
+                    noteViewModel.generatePdf(file,allNotes,context)
 
                 }
 
@@ -171,32 +171,7 @@ fun NoteListScreen(
     }
 }
 
-private fun writeTextData(file: File, data: State<List<NotesEntity>>, context: Context) {
-    var fileOutputStream: FileOutputStream? = null
-    val gson = Gson()
-    val jsonString = gson.toJson(data)
 
-    try {
-        fileOutputStream = FileOutputStream(file)
-        //fileOutputStream.write(jsonString.toByteArray())
 
-        data.value.forEach { entity ->
-            fileOutputStream.write("${entity.id}, ${entity.title}, ${entity.content}\n".toByteArray())
-        }
-    } catch (e: Exception) {
-        e.printStackTrace()
-    } finally {
-        if (fileOutputStream != null) {
-            try {
-                fileOutputStream.close()
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-        }
-    }
-}
 
-fun generateFileName(): String {
-    val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-    return "download_$timeStamp.txt" // You can adjust the file extension as per your requirements
-}
+

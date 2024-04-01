@@ -37,16 +37,11 @@ class MainActivity : ComponentActivity() {
 
     private val noteViewModel: NoteViewModel by viewModels()
 
-    val WRITE_EXTERNAL_STORAGE_REQUEST_CODE = 123
 
-
-    // @Inject lateinit var noteViewModel: NoteViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        //   appDatabase = NotesDb.getDatabase(applicationContext)
 
-        //  noteViewModel = NoteViewModel(appDatabase.notesDao())
 
 
 
@@ -66,26 +61,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-  @Deprecated("Deprecated in Java")
-     fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray,
-        context: Context,
-        dataListState: State<List<NotesEntity>>
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == WRITE_EXTERNAL_STORAGE_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted, proceed with the export operation
-                noteViewModel.exportToPDF(context, dataListState)
-                //noteViewModel.onPermissionResult(grantResults)
-            } else {
-                // Permission denied, handle accordingly
-                // You may inform the user that the permission is required for exporting
-            }
-        }
-    }
+
 
 
 
