@@ -113,7 +113,7 @@ class NoteViewModel @Inject constructor(private val notesDao: NoteDao) :ViewMode
         }// You can adjust the file extension as per your requirements
     }
 
-
+    // write text
      fun writeTextData(file: File, data: State<List<NotesEntity>>, context: Context) {
         var fileOutputStream: FileOutputStream? = null
         val gson = Gson()
