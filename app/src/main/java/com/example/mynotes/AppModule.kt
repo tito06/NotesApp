@@ -22,7 +22,8 @@ object AppModule {
             app,
             NotesDb::class.java,
             "notes"
-        ).build()
+        ).addMigrations(Migration_1_2)
+            .build()
     }   
 
 

@@ -21,8 +21,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
@@ -37,30 +35,44 @@ import com.example.mynotes.NavScreen
 import com.example.mynotes.NoteViewModel
 import com.example.mynotes.db.NotesEntity
 import android.Manifest
-import android.content.Context
-import android.graphics.Paint
-import android.graphics.pdf.PdfDocument
+
 import android.os.Environment
-import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.staggeredgrid.LazyHorizontalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.google.gson.Gson
-import java.io.ByteArrayOutputStream
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
+
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.toSize
+
 import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.ObjectOutputStream
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -71,13 +83,15 @@ fun NoteListScreen(
     noteViewModel: NoteViewModel
 ) {
 
+    val config = LocalConfiguration.current
+    val screenwith = config.screenWidthDp.dp
 
 
 
     val allNotes: State<List<NotesEntity>> =
         noteViewModel.allNotes.collectAsState(initial = emptyList())
 
-   val context = LocalContext.current
+    val context = LocalContext.current
 
 
 
@@ -87,66 +101,76 @@ fun NoteListScreen(
 
     var showDropDownMenu by remember { mutableStateOf(false) }
 
+    var showAllMenu by remember { mutableStateOf(false) }
+    var buttonPosition by remember { mutableStateOf(Offset.Zero) }
+    var buttonSize by remember { mutableStateOf(Size.Zero) }
+    var toggle by remember { mutableStateOf(false) }
+
+    //temp
+    val itemsChoice = listOf("all", "work", "personal", "grocery", "shopping")
+
+
 
     Scaffold(
         topBar = {
-                 TopAppBar(title = { Text(text = "Note App") },
-                     actions = {
-                        IconButton(onClick = { showDropDownMenu = true  }) {
-                            Icon(Icons.Filled.MoreVert, null)
+            TopAppBar(title = { Text(text = "Your Notes") },
 
-                        }
+                actions = {
+                    IconButton(onClick = { showDropDownMenu = true  }) {
+                        Icon(Icons.Filled.MoreVert, null)
 
-                         DropdownMenu(
-                             showDropDownMenu, { showDropDownMenu = false }
-                             // offset = DpOffset((-102).dp, (-64).dp),
-                         ) {
-                             DropdownMenuItem(text = { Text(text = "Export to pdf") }, leadingIcon = {
-                                 Icon(imageVector = Icons.Filled.ExitToApp, contentDescription ="Export" )
-                             }, onClick = {
-                                 val fileName = noteViewModel.generateFileName("pdf")
-                                 val file = File(folder, fileName)
-                                 if (noteViewModel.hasWritePermission(context)){
-                                     noteViewModel.generatePdf(file,allNotes,context)
+                    }
 
-                                 }else {
+                    DropdownMenu(
+                        showDropDownMenu, { showDropDownMenu = false }
+                        // offset = DpOffset((-102).dp, (-64).dp),
+                    ) {
+                        DropdownMenuItem(text = { Text(text = "Export to pdf") }, leadingIcon = {
+                            Icon(imageVector = Icons.Filled.ExitToApp, contentDescription ="Export" )
+                        }, onClick = {
+                            val fileName = noteViewModel.generateFileName("pdf")
+                            val file = File(folder, fileName)
+                            if (noteViewModel.hasWritePermission(context)){
+                                noteViewModel.generatePdf(file,allNotes,context)
 
-                                     ActivityCompat.requestPermissions(
-                                         context as Activity,
-                                         arrayOf<String?>(Manifest.permission.READ_EXTERNAL_STORAGE),
-                                         23
-                                     )
+                            }else {
 
-                                     noteViewModel.generatePdf(file,allNotes,context)
+                                ActivityCompat.requestPermissions(
+                                    context as Activity,
+                                    arrayOf<String?>(Manifest.permission.READ_EXTERNAL_STORAGE),
+                                    23
+                                )
 
-                                 }
-                                 showDropDownMenu = false
-                             })
-                             DropdownMenuItem(text = { Text(text = "Export to txt") }, leadingIcon = {
-                                 Icon(imageVector = Icons.Filled.ExitToApp, contentDescription ="Export" )
-                             }, onClick = {
-                                 val fileName = noteViewModel.generateFileName("txt")
-                                 val file = File(folder, fileName)
-                                 if (noteViewModel.hasWritePermission(context)){
-                                     noteViewModel.generatePdf(file,allNotes,context)
+                                noteViewModel.generatePdf(file,allNotes,context)
 
-                                 }else {
+                            }
+                            showDropDownMenu = false
+                        })
+                        DropdownMenuItem(text = { Text(text = "Export to txt") }, leadingIcon = {
+                            Icon(imageVector = Icons.Filled.ExitToApp, contentDescription ="Export" )
+                        }, onClick = {
+                            val fileName = noteViewModel.generateFileName("txt")
+                            val file = File(folder, fileName)
+                            if (noteViewModel.hasWritePermission(context)){
+                                noteViewModel.generatePdf(file,allNotes,context)
 
-                                     ActivityCompat.requestPermissions(
-                                         context as Activity,
-                                         arrayOf<String?>(Manifest.permission.READ_EXTERNAL_STORAGE),
-                                         23
-                                     )
+                            }else {
 
-                                     noteViewModel.writeTextData(file,allNotes,context)
+                                ActivityCompat.requestPermissions(
+                                    context as Activity,
+                                    arrayOf<String?>(Manifest.permission.READ_EXTERNAL_STORAGE),
+                                    23
+                                )
 
-                                 }
-                                 showDropDownMenu = false
-                             })
+                                noteViewModel.writeTextData(file,allNotes,context)
 
-                         }
-                     }
-                     )
+                            }
+                            showDropDownMenu = false
+                        })
+
+                    }
+                }
+            )
         },
         floatingActionButton = {
             FloatingActionButton(onClick = {
@@ -157,23 +181,136 @@ fun NoteListScreen(
             }
         }
     ) {
-        Column(modifier = Modifier.padding(10.dp)) {
-            IconButton(onClick = {
+
+
+
+        Column(modifier = Modifier
+            .padding(10.dp)
+            .padding(0.dp, 64.dp)) {
+
+            Row(modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween) {
+
+                Card(modifier = Modifier
+                    .height(50.dp)
+                    .width(screenwith / 2)
+                    .padding(4.dp, 4.dp),
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                           "Search".toString(),
+                            modifier = Modifier.padding(14.dp, 0.dp)
+                        )
+
+                        IconButton(onClick = {
+                            showAllMenu = !showAllMenu
+                        }, modifier = Modifier.onGloballyPositioned {
+                            buttonSize = it.size.toSize()
+                            buttonPosition = it.positionInRoot()
+                        }
+                           ) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowDropDown,
+                                contentDescription = "Down arrow"
+                            )
+                        }
+                        // Show the DropdownMenu
+                        if (showAllMenu) {
+                            DropdownMenu(
+                               modifier = Modifier
+                                   .align(alignment = Alignment.CenterVertically),
+                                expanded = showAllMenu,
+                                onDismissRequest = { showAllMenu = false },
+                                offset = DpOffset(
+                                    x = with(LocalDensity.current) { buttonPosition.x.toDp() },
+                                    y = with(LocalDensity.current) { (buttonPosition.y ).toDp() }
+                                )
+
+                            ) {
+                                DropdownMenuItem(text = { Text(text = "all") }, onClick = { /*TODO*/ })
+                                DropdownMenuItem(text = { Text(text = "work") }, onClick = { /*TODO*/ })
+                                DropdownMenuItem(text = { Text(text = "personal") }, onClick = { /*TODO*/ })
+                                DropdownMenuItem(text = { Text(text = "grocery") }, onClick = { /*TODO*/ })
+                                DropdownMenuItem(text = { Text(text = "shopping") }, onClick = { /*TODO*/ })
+                            }
+                        }
+                    }
 
 
 
 
-            }) {
-                Text(text = "PDF")
+                }
+
+                Row(horizontalArrangement = Arrangement.SpaceEvenly) {
+
+
+
+                    IconButton(onClick = {
+                        toggle = true
+                    }) {
+
+                        Icon(imageVector = Icons.Default.Add,
+                            contentDescription ="Test" )
+
+                    }
+
+                    IconButton(onClick = {toggle = false}) {
+
+                        Icon(imageVector = Icons.Default.List,
+                            contentDescription ="Test" )
+
+                    }
+
+                }
             }
-            LazyColumn{
+
+            Spacer(modifier = Modifier.height(15.dp))
+
+           LazyRow(modifier = Modifier
+               .fillMaxWidth()
+               .height(50.dp)) {
+                items(itemsChoice){
+                    
+                    Card(modifier = Modifier
+                        .width(100.dp)
+                        .fillMaxHeight()
+                        .padding(2.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color.White
+                        ),
+                        border = BorderStroke(1.dp, Color.Black)
+                        ) {
+                        
+                            Row(modifier = Modifier
+                                .fillMaxHeight()
+                                .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically) {
+                                Text(text = it)
+                            }
+                    }
+                }
+           }
+
+            Spacer(modifier = Modifier.height(15.dp))
+            if (!toggle) {
+                   LazyColumn(modifier = Modifier.background(Color.Transparent)){
                 items(allNotes.value){note ->
 
                     Card(modifier = Modifier
                         .height(100.dp)
                         .fillMaxWidth()
-                        .padding(4.dp, 4.dp)
-                        .background(Color.White)
+                        .padding(4.dp, 4.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color.White
+                        ),
+                        border = BorderStroke(1.dp, Color.Black)
                     ) {
 
                         Row(modifier = Modifier
@@ -181,14 +318,14 @@ fun NoteListScreen(
                             .fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween) {
                             Column {
-                                Text(text = note.title,
+                                Text(note.title,
                                     fontWeight = FontWeight.SemiBold,
                                     fontSize = 18.sp,
                                     color = Color.Blue
 
                                 )
                                 Spacer(modifier = Modifier.height(10.0.dp))
-                                Text(text = note.content,
+                                Text(text = note.content.toString(),
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Normal,
                                     color = Color.Magenta)
@@ -224,10 +361,89 @@ fun NoteListScreen(
 
                 }
             }
+            } else {
+                LazyHorizontalStaggeredGrid(
+                    rows = StaggeredGridCells.Fixed(2),
+                ) {
+
+                    items(allNotes.value) { note ->
+
+                        Card(
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .fillMaxWidth()
+                                .padding(4.dp, 4.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color.White
+                            ),
+                            border = BorderStroke(1.dp, Color.Black)
+                        ) {
+
+                            Column(
+                                modifier = Modifier
+                                    .padding(8.dp, 10.dp)
+                                    .fillMaxHeight(),
+                                verticalArrangement = Arrangement.Top,
+                                horizontalAlignment = Alignment.Start
+                            ) {
+                                Text(
+                                    note.title,
+                                    fontWeight = FontWeight.SemiBold,
+                                    fontSize = 18.sp,
+                                    color = Color.Blue
+
+                                )
+                                Spacer(modifier = Modifier.height(10.0.dp))
+                                Text(
+                                    text = note.content.toString(),
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Normal,
+                                    color = Color.Magenta
+                                )
+
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    IconButton(onClick = {
+                                        navController.navigate("${NavScreen.UpdateScreen.route}/${note.title}/${note.content}/${note.id}")
+                                    }) {
+                                        Icon(
+                                            imageVector = Icons.Default.Edit,
+                                            contentDescription = "Edit"
+                                        )
+
+                                    }
+
+
+                                    IconButton(onClick = {
+                                        noteViewModel.delete(note)
+                                    }) {
+
+                                        Icon(
+                                            imageVector = Icons.Default.Delete,
+                                            contentDescription = "Delete",
+                                            tint = Color.Red
+                                        )
+                                    }
+                                }
+                            }
+
+
+                        }
+                    }
+                }
+
+            }
+                
+            }
+
 
         }
-    }
-}
+
+        }
+
+
 
 
 

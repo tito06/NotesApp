@@ -1,5 +1,7 @@
 package com.example.mynotes.screens
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,7 +26,9 @@ import com.example.mynotes.NavScreen
 import com.example.mynotes.NoteViewModel
 import com.example.mynotes.db.NotesEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.time.LocalDate
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AddNoteScreen(
     navController: NavController,
@@ -34,6 +38,7 @@ fun AddNoteScreen(
 
     var noteTitle by remember { mutableStateOf("") }
     var noteContent by remember { mutableStateOf("") }
+    var date = LocalDate.now()
 
     Column(
         modifier = Modifier
@@ -60,7 +65,7 @@ fun AddNoteScreen(
 
         Button(
             onClick = {
-                val newNote = NotesEntity(title = noteTitle, content = noteContent)
+                val newNote = NotesEntity(title = noteTitle, content = noteContent, date = date)
                 noteViewModel.insert(newNote)
                 navController.navigate(NavScreen.NoteListScreen.route)
                // navController.popBackStack()
