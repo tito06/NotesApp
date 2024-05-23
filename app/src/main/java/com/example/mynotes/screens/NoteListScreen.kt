@@ -37,9 +37,12 @@ import com.example.mynotes.db.NotesEntity
 import android.Manifest
 
 import android.os.Environment
+import android.provider.CalendarContract.Colors
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.staggeredgrid.LazyHorizontalStaggeredGrid
@@ -68,11 +71,22 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.toSize
+import com.example.mynotes.R
+import com.example.mynotes.montserratFamily
+import com.example.mynotes.popinFamily
+import com.example.mynotes.popinFamilyNormal
+import com.example.mynotes.popinFamilyTitle
+import com.example.mynotes.popinFamilyhead
 
 import java.io.File
+import java.util.Random
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -85,6 +99,9 @@ fun NoteListScreen(
 
     val config = LocalConfiguration.current
     val screenwith = config.screenWidthDp.dp
+
+    val isDarkTheme = isSystemInDarkTheme()
+
 
 
 
@@ -113,7 +130,9 @@ fun NoteListScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(text = "Your Notes") },
+            TopAppBar(title = { Text(text = "Your Notes",
+                fontFamily = popinFamilyTitle
+            ) },
 
                 actions = {
                     IconButton(onClick = { showDropDownMenu = true  }) {
@@ -125,7 +144,7 @@ fun NoteListScreen(
                         showDropDownMenu, { showDropDownMenu = false }
                         // offset = DpOffset((-102).dp, (-64).dp),
                     ) {
-                        DropdownMenuItem(text = { Text(text = "Export to pdf") }, leadingIcon = {
+                        DropdownMenuItem(text = { Text(text = "Export to pdf",fontFamily = popinFamilyNormal) }, leadingIcon = {
                             Icon(imageVector = Icons.Filled.ExitToApp, contentDescription ="Export" )
                         }, onClick = {
                             val fileName = noteViewModel.generateFileName("pdf")
@@ -146,7 +165,8 @@ fun NoteListScreen(
                             }
                             showDropDownMenu = false
                         })
-                        DropdownMenuItem(text = { Text(text = "Export to txt") }, leadingIcon = {
+                        DropdownMenuItem(text = { Text(text = "Export to txt", fontFamily = popinFamilyNormal
+                        ) }, leadingIcon = {
                             Icon(imageVector = Icons.Filled.ExitToApp, contentDescription ="Export" )
                         }, onClick = {
                             val fileName = noteViewModel.generateFileName("txt")
@@ -185,8 +205,8 @@ fun NoteListScreen(
 
 
         Column(modifier = Modifier
-            .padding(10.dp)
-            .padding(0.dp, 64.dp)) {
+            .fillMaxHeight()
+            .padding(10.dp, 84.dp, 10.dp, 0.dp)) {
 
             Row(modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween) {
@@ -205,6 +225,7 @@ fun NoteListScreen(
                     ) {
                         Text(
                            "Search".toString(),
+                            fontFamily = popinFamily,
                             modifier = Modifier.padding(14.dp, 0.dp)
                         )
 
@@ -233,11 +254,11 @@ fun NoteListScreen(
                                 )
 
                             ) {
-                                DropdownMenuItem(text = { Text(text = "all") }, onClick = { /*TODO*/ })
-                                DropdownMenuItem(text = { Text(text = "work") }, onClick = { /*TODO*/ })
-                                DropdownMenuItem(text = { Text(text = "personal") }, onClick = { /*TODO*/ })
-                                DropdownMenuItem(text = { Text(text = "grocery") }, onClick = { /*TODO*/ })
-                                DropdownMenuItem(text = { Text(text = "shopping") }, onClick = { /*TODO*/ })
+                                DropdownMenuItem(text = { Text(text = "all", fontFamily = popinFamilyNormal) }, onClick = { /*TODO*/ })
+                                DropdownMenuItem(text = { Text(text = "work", fontFamily = popinFamilyNormal) }, onClick = { /*TODO*/ })
+                                DropdownMenuItem(text = { Text(text = "personal", fontFamily = popinFamilyNormal) }, onClick = { /*TODO*/ })
+                                DropdownMenuItem(text = { Text(text = "grocery", fontFamily = popinFamilyNormal) }, onClick = { /*TODO*/ })
+                                DropdownMenuItem(text = { Text(text = "shopping", fontFamily = popinFamilyNormal) }, onClick = { /*TODO*/ })
                             }
                         }
                     }
@@ -255,7 +276,9 @@ fun NoteListScreen(
                         toggle = true
                     }) {
 
-                        Icon(imageVector = Icons.Default.Add,
+                        Icon(
+                            painterResource(id = R.drawable.grid),
+                            modifier = Modifier.size(20.dp),
                             contentDescription ="Test" )
 
                     }
@@ -276,31 +299,62 @@ fun NoteListScreen(
                .fillMaxWidth()
                .height(50.dp)) {
                 items(itemsChoice){
-                    
-                    Card(modifier = Modifier
-                        .width(100.dp)
-                        .fillMaxHeight()
-                        .padding(2.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color.White
-                        ),
-                        border = BorderStroke(1.dp, Color.Black)
-                        ) {
-                        
-                            Row(modifier = Modifier
+                    if(isDarkTheme) {
+                        Card(
+                            modifier = Modifier
+                                .width(100.dp)
                                 .fillMaxHeight()
-                                .fillMaxWidth(),
+                                .padding(2.dp),
+
+                            border = BorderStroke(1.dp, Color.Black)
+                        ) {
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(),
                                 horizontalArrangement = Arrangement.Center,
-                                verticalAlignment = Alignment.CenterVertically) {
-                                Text(text = it)
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = it,
+                                    fontFamily = popinFamilyNormal
+                                )
                             }
+                        }
+                    } else {
+                        Card(
+                            modifier = Modifier
+                                .width(100.dp)
+                                .fillMaxHeight()
+                                .padding(2.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color.White
+                            ),
+                            border = BorderStroke(1.dp, Color.Black)
+                        ) {
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = it,
+                                    fontFamily = popinFamilyNormal
+                                )
+                            }
+                        }
+
                     }
                 }
            }
 
             Spacer(modifier = Modifier.height(15.dp))
             if (!toggle) {
-                   LazyColumn(modifier = Modifier.background(Color.Transparent)){
+                   LazyColumn(modifier = Modifier.fillMaxHeight()){
                 items(allNotes.value){note ->
 
                     Card(modifier = Modifier
@@ -308,7 +362,7 @@ fun NoteListScreen(
                         .fillMaxWidth()
                         .padding(4.dp, 4.dp),
                         colors = CardDefaults.cardColors(
-                            containerColor = Color.White
+                            containerColor = generateRandomColor()
                         ),
                         border = BorderStroke(1.dp, Color.Black)
                     ) {
@@ -321,14 +375,16 @@ fun NoteListScreen(
                                 Text(note.title,
                                     fontWeight = FontWeight.SemiBold,
                                     fontSize = 18.sp,
-                                    color = Color.Blue
+                                    color = Color.Black,
+                                    fontFamily = popinFamilyhead
 
                                 )
                                 Spacer(modifier = Modifier.height(10.0.dp))
-                                Text(text = note.content.toString(),
+                                Text(text = note.content,
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Normal,
-                                    color = Color.Magenta)
+                                    color = Color.Black,
+                                    fontFamily = popinFamilyNormal)
                             }
 
                             Row {
@@ -347,7 +403,7 @@ fun NoteListScreen(
 
                                     Icon(imageVector = Icons.Default.Delete,
                                         contentDescription ="Delete",
-                                        tint = Color.Red)
+                                        tint = Color.Black)
                                 }
                             }
 
@@ -370,36 +426,46 @@ fun NoteListScreen(
 
                         Card(
                             modifier = Modifier
-                                .fillMaxHeight()
-                                .fillMaxWidth()
+                                .height(70.dp)
+                                .width(170.dp)
                                 .padding(4.dp, 4.dp),
                             colors = CardDefaults.cardColors(
-                                containerColor = Color.White
+                                containerColor = generateRandomColor()
                             ),
                             border = BorderStroke(1.dp, Color.Black)
                         ) {
+
+
 
                             Column(
                                 modifier = Modifier
                                     .padding(8.dp, 10.dp)
                                     .fillMaxHeight(),
-                                verticalArrangement = Arrangement.Top,
+                                verticalArrangement = Arrangement.SpaceBetween,
                                 horizontalAlignment = Alignment.Start
                             ) {
-                                Text(
-                                    note.title,
-                                    fontWeight = FontWeight.SemiBold,
-                                    fontSize = 18.sp,
-                                    color = Color.Blue
 
-                                )
-                                Spacer(modifier = Modifier.height(10.0.dp))
-                                Text(
-                                    text = note.content.toString(),
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Normal,
-                                    color = Color.Magenta
-                                )
+                                Column {
+                                    Text(
+                                        note.title,
+                                        fontWeight = FontWeight.SemiBold,
+                                        fontSize = 18.sp,
+                                        color = Color.Black,
+                                        fontFamily = popinFamilyhead
+
+                                    )
+                                    Spacer(modifier = Modifier.height(10.0.dp))
+                                    Text(
+                                        text = note.content.toString(),
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Normal,
+                                        color = Color.Black,
+                                        fontFamily = popinFamilyNormal
+                                    )
+
+
+                                }
+
 
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
@@ -423,7 +489,7 @@ fun NoteListScreen(
                                         Icon(
                                             imageVector = Icons.Default.Delete,
                                             contentDescription = "Delete",
-                                            tint = Color.Red
+                                            tint = Color.Black
                                         )
                                     }
                                 }
@@ -441,7 +507,37 @@ fun NoteListScreen(
 
         }
 
+
+
         }
+
+fun generateRandomColor(): Color {
+    val random = Random()
+    val red = random.nextInt(256)
+    val green = random.nextInt(256)
+    val blue = random.nextInt(256)
+    val colors  = listOf(
+        Color(0xFF7986CB), // Indigo
+        Color(0xFF64B5F6), // Blue
+        Color(0xFF4FC3F7), // Light Blue
+        Color(0xFF4DD0E1), // Cyan
+        Color(0xFF4DB6AC), // Teal
+        Color(0xFF81C784), // Green
+        Color(0xFFAED581), // Light Green
+        Color(0xFFFF8A65), // Orange
+        Color(0xFFD4E157), // Lime
+        Color(0xFFFFD54F), // Amber
+        Color(0xFFFFB74D), // Deep Orange
+        Color(0xFFA1887F), // Brown
+        Color(0xFFE0E0E0), // Gray
+        Color(0xFF90A4AE)  // Blue Gray
+
+    )
+
+
+
+    return colors[random.nextInt(colors.size)]
+}
 
 
 
