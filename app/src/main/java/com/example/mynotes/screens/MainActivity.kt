@@ -4,11 +4,13 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -39,6 +41,7 @@ class MainActivity : ComponentActivity() {
     private val noteViewModel: NoteViewModel by viewModels()
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -69,6 +72,7 @@ class MainActivity : ComponentActivity() {
 
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Start(noteViewModel: NoteViewModel) {
 
@@ -87,6 +91,21 @@ fun Start(noteViewModel: NoteViewModel) {
             AddNoteScreen(navController = navController,
                 noteViewModel = noteViewModel
             )
+        }
+
+        composable(NavScreen.NoteDetailScreen.route + "/{title}" + "/{content}" + "/{id}"){
+            val title = it.arguments?.getString("title")
+            val content = it.arguments?.getString("content")
+            val id = it.arguments?.getString("id")
+            if(id!=null){
+                NoteDetailScreen(
+                    navController = navController,
+                    noteViewModel = noteViewModel,
+                    title = title,
+                    content = content,
+                    id = id.toLong()
+                )
+            }
         }
 
 

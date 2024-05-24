@@ -206,7 +206,7 @@ fun NoteListScreen(
 
         Column(modifier = Modifier
             .fillMaxHeight()
-            .padding(10.dp, 84.dp, 10.dp, 0.dp)) {
+            .padding(10.dp, 87.dp, 10.dp, 0.dp)) {
 
             Row(modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween) {
@@ -364,6 +364,10 @@ fun NoteListScreen(
                         colors = CardDefaults.cardColors(
                             containerColor = generateRandomColor()
                         ),
+                        onClick = {
+                            navController.navigate("${NavScreen.NoteDetailScreen.route}/${note.title}/${note.content}/${note.id}")
+
+                        },
                         border = BorderStroke(1.dp, Color.Black)
                     ) {
 
@@ -388,13 +392,7 @@ fun NoteListScreen(
                             }
 
                             Row {
-                                IconButton(onClick = {
-                                    navController.navigate("${NavScreen.UpdateScreen.route}/${note.title}/${note.content}/${note.id}")
-                                }) {
-                                    Icon(imageVector = Icons.Default.Edit,
-                                        contentDescription ="Edit" )
 
-                                }
 
 
                                 IconButton(onClick = {
@@ -432,6 +430,10 @@ fun NoteListScreen(
                             colors = CardDefaults.cardColors(
                                 containerColor = generateRandomColor()
                             ),
+                            onClick = {
+                                navController.navigate("${NavScreen.NoteDetailScreen.route}/${note.title}/${note.content}/${note.id}")
+
+                            },
                             border = BorderStroke(1.dp, Color.Black)
                         ) {
 
@@ -471,15 +473,7 @@ fun NoteListScreen(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
-                                    IconButton(onClick = {
-                                        navController.navigate("${NavScreen.UpdateScreen.route}/${note.title}/${note.content}/${note.id}")
-                                    }) {
-                                        Icon(
-                                            imageVector = Icons.Default.Edit,
-                                            contentDescription = "Edit"
-                                        )
 
-                                    }
 
 
                                     IconButton(onClick = {
