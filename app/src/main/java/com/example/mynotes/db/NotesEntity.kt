@@ -11,5 +11,6 @@ data class NotesEntity (
     val id:Long = 0,
     val title:String,
     val content:String,
-    val date: LocalDate
+    val date: LocalDate,
+    val category: String
 )

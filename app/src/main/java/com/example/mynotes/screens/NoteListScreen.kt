@@ -39,11 +39,14 @@ import android.Manifest
 import android.os.Environment
 import android.provider.CalendarContract.Colors
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.staggeredgrid.LazyHorizontalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
@@ -125,6 +128,12 @@ fun NoteListScreen(
 
     //temp
     val itemsChoice = listOf("all", "work", "personal", "grocery", "shopping")
+    val items  = listOf("All","Personal", "Work", "Grocery", "Shopping")
+    var selectedItemSearch by remember {
+        mutableStateOf("Search")
+    }
+
+    var selectedItem by remember { mutableStateOf<String?>(itemsChoice[0]) }
 
 
 
@@ -224,7 +233,7 @@ fun NoteListScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                           "Search".toString(),
+                            selectedItemSearch,
                             fontFamily = popinFamily,
                             modifier = Modifier.padding(14.dp, 0.dp)
                         )
@@ -235,33 +244,38 @@ fun NoteListScreen(
                             buttonSize = it.size.toSize()
                             buttonPosition = it.positionInRoot()
                         }
-                           ) {
+                        ) {
                             Icon(
                                 imageVector = Icons.Default.ArrowDropDown,
                                 contentDescription = "Down arrow"
                             )
                         }
+                    }
                         // Show the DropdownMenu
                         if (showAllMenu) {
-                            DropdownMenu(
-                               modifier = Modifier
-                                   .align(alignment = Alignment.CenterVertically),
-                                expanded = showAllMenu,
-                                onDismissRequest = { showAllMenu = false },
-                                offset = DpOffset(
-                                    x = with(LocalDensity.current) { buttonPosition.x.toDp() },
-                                    y = with(LocalDensity.current) { (buttonPosition.y ).toDp() }
-                                )
-
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .wrapContentSize(Alignment.Center)
                             ) {
-                                DropdownMenuItem(text = { Text(text = "all", fontFamily = popinFamilyNormal) }, onClick = { /*TODO*/ })
-                                DropdownMenuItem(text = { Text(text = "work", fontFamily = popinFamilyNormal) }, onClick = { /*TODO*/ })
-                                DropdownMenuItem(text = { Text(text = "personal", fontFamily = popinFamilyNormal) }, onClick = { /*TODO*/ })
-                                DropdownMenuItem(text = { Text(text = "grocery", fontFamily = popinFamilyNormal) }, onClick = { /*TODO*/ })
-                                DropdownMenuItem(text = { Text(text = "shopping", fontFamily = popinFamilyNormal) }, onClick = { /*TODO*/ })
+                                DropdownMenu(
+                                    expanded = showAllMenu,
+                                    onDismissRequest = { showAllMenu = false },
+
+
+                                ) {
+                                 items.forEach {
+                                     DropdownMenuItem(
+                                         text = { Text(text = it) },
+                                         onClick = {
+                                             selectedItemSearch = it
+                                             showAllMenu = false
+                                         })
+                                 }
+                                }
                             }
                         }
-                    }
+
 
 
 
@@ -323,13 +337,16 @@ fun NoteListScreen(
                             }
                         }
                     } else {
+                        val backgroundColor = if (selectedItem == it) Color.Gray else Color.White
+
                         Card(
                             modifier = Modifier
                                 .width(100.dp)
                                 .fillMaxHeight()
-                                .padding(2.dp),
+                                .padding(2.dp)
+                                .clickable { selectedItem = it},
                             colors = CardDefaults.cardColors(
-                                containerColor = Color.White
+                                containerColor = backgroundColor
                             ),
                             border = BorderStroke(1.dp, Color.Black)
                         ) {

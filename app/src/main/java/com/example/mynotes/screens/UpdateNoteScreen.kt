@@ -70,7 +70,7 @@ fun UpdateNoteScreen(
         Button(
             onClick = {
                 val updatedNote = NotesEntity(id= id,title = noteTitle!!, content = noteContent!!,
-                    date)
+                    date, category = "")
                 noteViewModel.update(updatedNote)
                 navController.navigate(NavScreen.NoteListScreen.route)
                // navController.popBackStack()

@@ -79,7 +79,7 @@ fun AddNoteScreen(
     var buttonPosition by remember { mutableStateOf(Offset.Zero) }
     var buttonSize by remember { mutableStateOf(Size.Zero) }
     val context = LocalContext.current
-    val items  = listOf("Personal", "Work", "Grocery", "Shopping")
+    val items  = listOf("All","Personal", "Work", "Grocery", "Shopping")
     var selectedItem by remember {
         mutableStateOf(items[0])
     }
@@ -213,7 +213,7 @@ fun AddNoteScreen(
                 onClick = {
                     if (noteTitle.isNotEmpty() && noteContent.isNotEmpty()) {
                         val newNote =
-                            NotesEntity(title = noteTitle, content = noteContent, date = date)
+                            NotesEntity(title = noteTitle, content = noteContent, date = date, category = selectedItem)
                         noteViewModel.insert(newNote)
                         navController.navigate(NavScreen.NoteListScreen.route)
                     }else{
