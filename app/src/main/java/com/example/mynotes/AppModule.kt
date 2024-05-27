@@ -1,13 +1,12 @@
 package com.example.mynotes
 
 import android.app.Application
-import android.content.Context
 import androidx.room.Room
+import com.example.mynotes.ViewModel.NoteViewModel
 import com.example.mynotes.db.NotesDb
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -29,7 +28,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideVm(notedb:NotesDb):NoteViewModel{
+    fun provideVm(notedb:NotesDb): NoteViewModel {
         return NoteViewModel(notedb.notesDao())
     }
 

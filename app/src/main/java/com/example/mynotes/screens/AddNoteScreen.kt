@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -34,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,20 +46,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.input.KeyboardType.Companion.Text
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.mynotes.NavScreen
-import com.example.mynotes.NoteViewModel
+import com.example.mynotes.ViewModel.NoteViewModel
 import com.example.mynotes.db.NotesEntity
 import com.example.mynotes.popinFamily
-import com.example.mynotes.popinFamilyNormal
 import com.example.mynotes.popinFamilyTitle
-import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.LocalDate
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -72,17 +66,15 @@ fun AddNoteScreen(
 ) {
 
 
-    var noteTitle by remember { mutableStateOf("") }
-    var noteContent by remember { mutableStateOf("") }
-    var date = LocalDate.now()
+
     var showAllMenu by remember { mutableStateOf(false) }
-    var buttonPosition by remember { mutableStateOf(Offset.Zero) }
-    var buttonSize by remember { mutableStateOf(Size.Zero) }
+
     val context = LocalContext.current
     val items  = listOf("All","Personal", "Work", "Grocery", "Shopping")
     var selectedItem by remember {
         mutableStateOf(items[0])
     }
+
 
     Scaffold(
         topBar = {
@@ -96,8 +88,8 @@ fun AddNoteScreen(
                 .padding(16.dp, 80.dp, 16.dp, 0.dp)
         ) {
             OutlinedTextField(
-                value = noteTitle,
-                onValueChange = { noteTitle = it },
+                value = noteViewModel.addnoteTitleNew,
+                onValueChange = { noteViewModel.addnoteTitleNew = it},
                 label = { Text(text = "Title") },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -133,8 +125,7 @@ fun AddNoteScreen(
                     onClick = {
                         showAllMenu = !showAllMenu
                     }, modifier = Modifier.onGloballyPositioned {
-                        buttonSize = it.size.toSize()
-                        buttonPosition = it.positionInRoot()
+
                     },
                     colors = IconButtonDefaults.iconButtonColors(Color.Red)
                 ) {
@@ -191,8 +182,8 @@ fun AddNoteScreen(
             ) {
 
                 TextField(
-                    value = noteContent,
-                    onValueChange = { noteContent = it },
+                    value = noteViewModel.noteContent,
+                    onValueChange = { noteViewModel.noteContent = it },
                     label = { Text(text = "Content") },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -211,9 +202,9 @@ fun AddNoteScreen(
 
             Button(
                 onClick = {
-                    if (noteTitle.isNotEmpty() && noteContent.isNotEmpty()) {
+                    if (noteViewModel.addnoteTitleNew.isNotEmpty() && noteViewModel.noteContent.isNotEmpty()) {
                         val newNote =
-                            NotesEntity(title = noteTitle, content = noteContent, date = date, category = selectedItem)
+                            NotesEntity(title = noteViewModel.addnoteTitleNew.toString(), content = noteViewModel.noteContent, date = noteViewModel.date, category = selectedItem)
                         noteViewModel.insert(newNote)
                         navController.navigate(NavScreen.NoteListScreen.route)
                     }else{

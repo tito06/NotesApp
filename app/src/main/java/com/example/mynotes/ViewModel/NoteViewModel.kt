@@ -1,15 +1,18 @@
-package com.example.mynotes
+package com.example.mynotes.ViewModel
 
 import android.Manifest
-import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
-import android.os.Environment
+import android.os.Build
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.State
-import androidx.core.app.ActivityCompat
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -18,26 +21,33 @@ import androidx.lifecycle.viewModelScope
 import com.example.mynotes.db.NoteDao
 import com.example.mynotes.db.NotesEntity
 import com.google.gson.Gson
-import com.itextpdf.text.Document
-import com.itextpdf.text.PageSize
-import com.itextpdf.text.Paragraph
-import com.itextpdf.text.pdf.PdfWriter
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
 class NoteViewModel @Inject constructor(private val notesDao: NoteDao) :ViewModel() {
+
+
+// for add notes screen
+    var addnoteTitleNew by mutableStateOf("")
+    var noteContent by   mutableStateOf("")
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    var date = LocalDate.now()
+
+
+
 
     val allNotes: Flow<List<NotesEntity>> = notesDao.getAllNotes()
     val WRITE_EXTERNAL_STORAGE_REQUEST_CODE = 123
