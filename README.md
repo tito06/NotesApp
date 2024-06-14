@@ -1,6 +1,7 @@
 Notes App 
 
-A app where user can add, update, and delete info of his or her choice.
+An app where user can add, update, and delete info of his or her choice.
+Jetpack compose is used to make the UI.
 the app usess mvvm architechture.
 Hilt for DI.
 Room DB to store and update data
